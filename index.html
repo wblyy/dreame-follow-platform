@@ -219,7 +219,7 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
   </header>
 
   <!-- Dashboard Tab -->
-  <div id="tab-dashboard" class="tab-page">
+  <div id="tab-dashboard" class="tab-page hidden">
     <div class="notice-banner" style="display:flex;gap:14px;align-items:center">
       <img src="https://storage.res-capy.com/storage/upload/users/usr_01KHTDRMH9FEHH1M58ZJG7WT40/workspaces/default-workspace/sessions/1777530523562/33ee2837-7d78-44c8-afb8-7ea1e35fb00b.jpg"
         alt="俞浩" style="width:60px;height:60px;border-radius:50%;object-fit:cover;object-position:center top;border:2px solid rgba(255,255,255,.5);flex-shrink:0" />
@@ -248,9 +248,18 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
   </div>
 
   <!-- Discover Tab -->
-  <div id="tab-discover" class="tab-page hidden">
+  <div id="tab-discover" class="tab-page">
     <div class="page-title">互粉广场</div>
-    <div class="page-subtitle">点击同事账号链接完成关注，帮彼此涨粉</div>
+    <div class="page-subtitle">点击同事账号完成关注，大家一起帮老板冲粉丝</div>
+    <!-- CTA: user has no accounts yet -->
+    <div id="discover-cta" style="display:none;margin:0 0 10px;background:linear-gradient(135deg,#fff7ed,#fef3c7);border:2px solid #fbbf24;border-radius:14px;padding:16px">
+      <div style="font-size:14px;font-weight:800;color:#92400e;margin-bottom:6px">先上传你的账号，才能让别人回粉你</div>
+      <div style="font-size:12px;color:#a16207;line-height:1.6;margin-bottom:12px">你现在可以关注别人，但别人不知道你在哪儿。<br>上传账号链接 → 别人回粉你 → 粉丝数增长 → 拿奖金</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="switchToAccounts()" style="flex:1;padding:10px;background:#f59e0b;color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer">+ 立即上传我的账号</button>
+        <button onclick="document.getElementById('discover-cta').style.display='none'" style="padding:10px 14px;background:white;color:#92400e;border:1.5px solid #fcd34d;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer">先看看</button>
+      </div>
+    </div>
     <input type="text" class="search-bar" placeholder="🔍 搜索同事姓名或部门..." id="discover-search" oninput="renderDiscover()" />
     <div id="discover-list"></div>
   </div>
@@ -264,13 +273,13 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
   </div>
 
   <nav class="bottom-nav">
-    <button class="nav-item active" onclick="switchTab('dashboard',this)">
+    <button class="nav-item" onclick="switchTab('dashboard',this)">
       <span class="nav-icon">📊</span><span class="nav-label">我的进度</span>
     </button>
     <button class="nav-item" onclick="switchTab('accounts',this)">
       <span class="nav-icon">📱</span><span class="nav-label">我的账号</span>
     </button>
-    <button class="nav-item" onclick="switchTab('discover',this)">
+    <button class="nav-item active" onclick="switchTab('discover',this)">
       <span class="nav-icon">🤝</span><span class="nav-label">互粉广场</span>
     </button>
     <button class="nav-item" onclick="switchTab('leaderboard',this)">
@@ -402,7 +411,11 @@ function switchTab(tab,btn){
   if(tab==='discover')renderDiscover();
   if(tab==='leaderboard')renderLeaderboard();
 }
-function renderAll(){renderDashboard()}
+function renderAll(){renderDiscover()}
+function switchToAccounts(){
+  const btn=document.querySelector('.nav-item:nth-child(2)');
+  if(btn)switchTab('accounts',btn);
+}
 
 // ====== DASHBOARD ======
 function renderDashboard(){
@@ -485,7 +498,9 @@ function onUrlInput(){
   }else{openBtn.style.display='none';fetchBtn.style.display='none';}
 }
 
-const FANS_PROXY='http://8.139.4.60/fans';
+// CN server: use relative URL (same-origin, no Mixed Content)
+// GitHub Pages: use absolute HTTP (blocked by browser Mixed Content)
+const FANS_PROXY=location.hostname==='8.139.4.60'?'/fans':'http://8.139.4.60/fans';
 
 function parseUserId(url){
   // XHS: https://www.xiaohongshu.com/user/profile/5b67431a69d6ce0001a73c66
@@ -593,6 +608,16 @@ function markFollowBack(eid,ev){
 function renderDiscover(){
   const e=getEmp(),following=e.following||[],followBacks=e.followBacks||[];
   const q=(document.getElementById('discover-search')?.value||'').toLowerCase();
+  const myAccounts=Object.keys(e.accounts||{});
+  // Show CTA banner if user has no accounts yet
+  const ctaBanner=document.getElementById('discover-cta');
+  if(ctaBanner){
+    if(!myAccounts.length){
+      ctaBanner.style.display='block';
+    }else{
+      ctaBanner.style.display='none';
+    }
+  }
   const others=employees.filter(x=>{
     if(x.id===currentUser.id)return false;
     if(!Object.keys(x.accounts).length)return false;
