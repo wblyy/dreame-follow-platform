@@ -276,11 +276,18 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
     <div class="modal-title" id="modal-platform-title">编辑账号</div>
     <div class="form-group">
       <label>账号主页链接</label>
-      <input type="url" id="m-url" placeholder="https://" />
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="url" id="m-url" placeholder="https://" style="flex:1" oninput="onUrlInput()" />
+        <a id="m-open-btn" href="#" target="_blank" class="btn-sm" style="white-space:nowrap;display:none;text-decoration:none">打开</a>
+      </div>
     </div>
     <div class="form-group">
-      <label>当前粉丝数</label>
-      <input type="number" id="m-followers" placeholder="0" min="0" />
+      <label style="display:flex;justify-content:space-between;align-items:center">
+        <span>当前粉丝数 <span style="color:#ef4444;font-size:10px">*需手动或自动获取</span></span>
+        <button id="m-fetch-btn" onclick="tryAutoFetch()" style="display:none;background:#10b981;color:white;border:none;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">🔄 自动获取</button>
+      </label>
+      <input type="number" id="m-followers" placeholder="填写你的实际粉丝数（如 12000）" min="0" />
+      <div id="m-fetch-hint" style="font-size:11px;margin-top:5px;line-height:1.5"></div>
     </div>
     <button class="btn-primary" onclick="savePlatform()">保存</button>
   </div>
@@ -459,13 +466,81 @@ function renderAccounts(){
 }
 
 // ====== EDIT PLATFORM ======
+function onUrlInput(){
+  const url=document.getElementById('m-url').value.trim();
+  const openBtn=document.getElementById('m-open-btn');
+  const fetchBtn=document.getElementById('m-fetch-btn');
+  if(url&&url.startsWith('http')){
+    openBtn.href=url;openBtn.style.display='block';fetchBtn.style.display='block';
+  }else{openBtn.style.display='none';fetchBtn.style.display='none';}
+}
+
+async function fetchFollowerCount(url){
+  try{
+    // Bilibili has a public API
+    if(url.includes('bilibili.com')){
+      const m=url.match(/space\.bilibili\.com\/(\d+)/);
+      if(m){
+        const r=await fetch(`https://api.bilibili.com/x/relation/stat?vmid=${m[1]}`,{signal:AbortSignal.timeout(6000)});
+        const d=await r.json();
+        if(d.code===0)return d.data.follower;
+      }
+    }
+    // Try CORS proxy for other platforms
+    const proxy=`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const r=await fetch(proxy,{signal:AbortSignal.timeout(12000)});
+    const d=await r.json();
+    const html=d.contents||'';
+    // Xiaohongshu patterns
+    if(url.includes('xiaohongshu.com')){
+      const pats=[/"fans_count"\s*:\s*(\d+)/,/"fansCount"\s*:\s*(\d+)/,/"follower_count"\s*:\s*(\d+)/,/"followerCount"\s*:\s*(\d+)/];
+      for(const p of pats){const m=html.match(p);if(m)return parseInt(m[1]);}
+    }
+    // Douyin patterns
+    if(url.includes('douyin.com')){
+      const m=html.match(/"follower_count"\s*:\s*(\d+)/)||html.match(/"fans_count"\s*:\s*(\d+)/);
+      if(m)return parseInt(m[1]);
+    }
+    // Weibo patterns
+    if(url.includes('weibo.com')){
+      const m=html.match(/"followers_count"\s*:\s*(\d+)/)||html.match(/"fans_count"\s*:\s*(\d+)/);
+      if(m)return parseInt(m[1]);
+    }
+    // Generic JSON key patterns
+    const generic=html.match(/"(?:fans|follower|fansCount|followers)_?[Cc]ount"\s*:\s*(\d+)/);
+    if(generic)return parseInt(generic[1]);
+  }catch(e){console.warn('auto fetch error:',e)}
+  return null;
+}
+
+async function tryAutoFetch(){
+  const url=document.getElementById('m-url').value.trim();
+  const btn=document.getElementById('m-fetch-btn');
+  const hint=document.getElementById('m-fetch-hint');
+  btn.textContent='获取中...';btn.disabled=true;
+  hint.style.color='#64748b';hint.textContent='正在尝试获取真实粉丝数，请稍候...';
+  const count=await fetchFollowerCount(url);
+  btn.textContent='🔄 自动获取';btn.disabled=false;
+  if(count!==null&&count>0){
+    document.getElementById('m-followers').value=count;
+    hint.style.color='#10b981';
+    hint.textContent=`✓ 自动获取成功：${fmt(count)} 粉丝`;
+  }else{
+    hint.style.color='#ef4444';
+    hint.innerHTML='自动获取失败（平台有反爬保护）。<br>请手动操作：点击上方「打开」按钮查看账号页面，将粉丝数填入上方输入框。';
+  }
+}
+
 function openEdit(pid){
   _editPid=pid;
   const p=PLATFORMS.find(x=>x.id===pid),e=getEmp(),a=e.accounts[pid]||{};
   document.getElementById('modal-platform-title').textContent=`${p.icon} ${p.name} 账号信息`;
   document.getElementById('m-url').value=a.url||'';
   document.getElementById('m-followers').value=a.followers||'';
+  document.getElementById('m-fetch-hint').textContent='';
   document.getElementById('modal-platform').classList.remove('hidden');
+  // Show/hide helper buttons based on existing URL
+  onUrlInput();
 }
 function savePlatform(){
   const url=document.getElementById('m-url').value.trim();
