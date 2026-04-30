@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>追觅互粉互助平台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#1a6cf3;--primary-dark:#1354c7;--success:#10b981;
+  --warning:#f59e0b;--danger:#ef4444;--bg:#f5f7fb;--card:#fff;
+  --text:#1a202c;--text-secondary:#64748b;--border:#e2e8f0;
+  --radius:12px;--shadow:0 2px 12px rgba(0,0,0,.08);--nav-height:64px
+}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:480px;margin:0 auto;position:relative}
+.hidden{display:none!important}
+
+/* LOGIN */
+#page-login{min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1a6cf3 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.login-logo{color:white;text-align:center;margin-bottom:40px}
+.login-logo .brand{font-size:26px;font-weight:800;letter-spacing:3px;margin-bottom:6px}
+.login-logo .slogan{font-size:13px;opacity:.65;line-height:1.6}
+.login-card{background:white;border-radius:20px;padding:32px 24px;width:100%;max-width:360px;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.login-card h2{font-size:19px;font-weight:700;margin-bottom:22px}
+.bonus-info{background:#fffbeb;border:1.5px solid #fcd34d;border-radius:10px;padding:12px;margin-bottom:20px;font-size:12px;line-height:1.7;color:#92400e}
+.bonus-info strong{color:#b45309}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:5px}
+.form-group input,.form-group select{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:14px;color:var(--text);background:white;outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus{border-color:var(--primary)}
+.btn-primary{width:100%;padding:13px;background:var(--primary);color:white;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;transition:all .2s}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-primary:active{transform:scale(.98)}
+.demo-hint{text-align:center;font-size:11px;color:#94a3b8;margin-top:10px}
+
+/* APP SHELL */
+#app{min-height:100vh;padding-bottom:var(--nav-height)}
+.app-header{background:linear-gradient(135deg,#0f172a,#1a2980);color:white;padding:14px 18px;position:sticky;top:0;z-index:100}
+.header-top{display:flex;align-items:center;justify-content:space-between}
+.header-brand{font-size:15px;font-weight:800;letter-spacing:1.5px}
+.header-user{display:flex;align-items:center;gap:8px;font-size:13px;opacity:.8}
+.avatar{width:32px;height:32px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:var(--nav-height);background:white;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;z-index:100;box-shadow:0 -4px 12px rgba(0,0,0,.06)}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:8px 12px;flex:1;border:none;background:none;transition:all .2s}
+.nav-item .nav-icon{font-size:21px;line-height:1;transition:transform .2s}
+.nav-item .nav-label{font-size:10px;color:var(--text-secondary);font-weight:500}
+.nav-item.active .nav-label{color:var(--primary);font-weight:700}
+.nav-item.active .nav-icon{transform:scale(1.15)}
+
+/* CONTENT */
+.tab-page{padding:14px}
+
+/* CARD */
+.card{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:10px;box-shadow:var(--shadow)}
+.card-title{font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:11px}
+
+/* PROGRESS */
+.progress-container{margin-bottom:12px}
+.progress-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.progress-label{font-size:13px;font-weight:600}
+.progress-meta{font-size:11px;color:var(--text-secondary)}
+.progress-bar{height:9px;background:#e2e8f0;border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#1a6cf3,#6366f1);transition:width .8s cubic-bezier(.4,0,.2,1)}
+.progress-fill.t2{background:linear-gradient(90deg,#10b981,#06b6d4)}
+.progress-fill.t3{background:linear-gradient(90deg,#f59e0b,#ef4444)}
+
+/* REWARD TIERS */
+.reward-tiers{display:flex;gap:7px;margin-top:14px}
+.tier-badge{flex:1;text-align:center;padding:10px 4px;border-radius:10px;border:2px solid transparent;background:var(--bg)}
+.tier-badge.achieved{border-color:#fbbf24;background:#fffbeb}
+.tier-badge.current{border-color:var(--primary);background:#eff6ff}
+.tier-amount{font-size:13px;font-weight:700}
+.tier-reward{font-size:11px;color:var(--warning);font-weight:700}
+.tier-status{font-size:10px;color:var(--text-secondary);margin-top:2px}
+
+/* PLATFORM ITEMS */
+.platform-item{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);gap:11px}
+.platform-item:last-child{border-bottom:none}
+.p-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.p-info{flex:1;min-width:0}
+.p-name{font-size:13px;font-weight:700;margin-bottom:1px}
+.p-url{font-size:11px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-fans{text-align:right;flex-shrink:0}
+.fans-count{font-size:15px;font-weight:800;color:var(--primary)}
+.fans-label{font-size:10px;color:var(--text-secondary)}
+.btn-sm{background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;white-space:nowrap}
+.btn-sm:hover{background:var(--primary-dark)}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:13px;box-shadow:var(--shadow);text-align:center}
+.stat-value{font-size:23px;font-weight:800;color:var(--primary)}
+.stat-label{font-size:11px;color:var(--text-secondary);margin-top:2px}
+
+/* NOTICE */
+.notice-banner{background:linear-gradient(135deg,#0f172a,#1a6cf3);color:white;border-radius:var(--radius);padding:14px 16px;margin-bottom:12px}
+.notice-title{font-size:14px;font-weight:800;margin-bottom:5px}
+.notice-text{font-size:12px;opacity:.75;line-height:1.7}
+
+/* DISCOVER CARDS */
+.emp-card{background:white;border-radius:var(--radius);padding:14px;margin-bottom:9px;box-shadow:var(--shadow)}
+.emp-header{display:flex;align-items:center;gap:11px;margin-bottom:11px}
+.emp-info h3{font-size:14px;font-weight:700}
+.emp-info .dept{font-size:11px;color:var(--text-secondary)}
+.emp-fans{margin-left:auto;text-align:right}
+.emp-total{font-size:17px;font-weight:800;color:var(--primary)}
+.emp-total-label{font-size:10px;color:var(--text-secondary)}
+.platform-links{display:flex;gap:7px;flex-wrap:wrap}
+.p-link-btn{display:inline-flex;align-items:center;gap:3px;padding:5px 9px;border-radius:7px;border:1.5px solid var(--border);background:white;cursor:pointer;font-size:11px;font-weight:600;color:var(--text);text-decoration:none;transition:all .2s}
+.p-link-btn:hover{border-color:var(--primary);color:var(--primary)}
+.p-link-btn.followed{border-color:var(--success);background:#f0fdf4;color:var(--success)}
+
+/* LEADERBOARD */
+.lb-item{display:flex;align-items:center;padding:11px 14px;background:white;border-radius:var(--radius);margin-bottom:7px;box-shadow:var(--shadow);gap:11px}
+.lb-item.me{border:2px solid var(--primary);background:#f0f7ff}
+.rank-badge{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.r1{background:#ffd700;color:#7c5200}
+.r2{background:#c0c0c0;color:#3a3a3a}
+.r3{background:#cd7f32;color:white}
+.rn{background:var(--bg);color:var(--text-secondary);font-size:11px}
+.lb-name{flex:1;font-size:13px;font-weight:700}
+.lb-dept{font-size:11px;color:var(--text-secondary);font-weight:400}
+.lb-fans{text-align:right}
+.lb-total{font-size:15px;font-weight:800;color:var(--primary)}
+.lb-tier{font-size:10px;font-weight:600}
+.tier-gold{color:var(--warning)}
+.tier-blue{color:var(--primary)}
+.tier-none{color:var(--text-secondary)}
+
+/* MY RANK */
+.my-rank-card{background:linear-gradient(135deg,#0f172a,#1a2980);color:white;border-radius:var(--radius);padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
+.my-rank-num{font-size:40px;font-weight:900;color:#ffd700;line-height:1;flex-shrink:0}
+.my-rank-info h3{font-size:14px;font-weight:700;margin-bottom:3px}
+.my-rank-info p{font-size:12px;opacity:.65}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.modal-content{background:white;border-radius:20px 20px 0 0;padding:24px;width:100%;max-width:480px;max-height:80vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:800;margin-bottom:18px}
+.modal-close{float:right;background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-secondary);line-height:1}
+
+/* PAGE HEADER */
+.page-title{font-size:20px;font-weight:800;padding:14px 14px 0}
+.page-subtitle{font-size:12px;color:var(--text-secondary);padding:4px 14px 10px}
+.search-bar{display:block;margin:0 14px 10px;padding:10px 14px;background:white;border:1.5px solid var(--border);border-radius:99px;font-size:13px;width:calc(100% - 28px);outline:none}
+.search-bar:focus{border-color:var(--primary)}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-secondary)}
+.empty-icon{font-size:44px;margin-bottom:10px}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(16px);background:#0f172a;color:white;padding:9px 20px;border-radius:99px;font-size:12px;font-weight:600;z-index:300;opacity:0;transition:all .3s;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* SECTION TITLE */
+.section-title{font-size:13px;font-weight:700;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="page-login">
+  <div class="login-logo">
+    <img src="https://storage.res-capy.com/storage/upload/users/usr_01KHTDRMH9FEHH1M58ZJG7WT40/workspaces/default-workspace/sessions/1777530523562/33ee2837-7d78-44c8-afb8-7ea1e35fb00b.jpg"
+      alt="俞浩" style="width:88px;height:88px;border-radius:50%;object-fit:cover;object-position:center top;border:3px solid rgba(255,255,255,.4);margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,.3)" />
+    <div class="brand">追觅互粉平台</div>
+    <div class="slogan">追觅人专属 · 互粉互助 · 拿奖金更轻松</div>
+  </div>
+  <div class="login-card">
+    <h2>员工登录</h2>
+    <div class="bonus-info">
+      🎯 <strong>俞浩承诺：</strong>真实粉丝 1万→奖励¥1万 · 5万→¥5万 · 10万→¥10万<br>
+      全员互粉，一起达成目标！
+    </div>
+    <div class="form-group">
+      <label>工号</label>
+      <input type="text" id="login-id" placeholder="如 EMP001" />
+    </div>
+    <div class="form-group">
+      <label>姓名</label>
+      <input type="text" id="login-name" placeholder="你的真实姓名" />
+    </div>
+    <div class="form-group">
+      <label>部门</label>
+      <select id="login-dept">
+        <option>产品部</option><option>技术部</option><option>设计部</option>
+        <option>市场部</option><option>销售部</option><option>运营部</option>
+        <option>供应链部</option><option>人力资源部</option><option>财务部</option><option>客服部</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="handleLogin()">进入平台</button>
+    <p class="demo-hint">Demo 模式 · 数据存储在本地浏览器</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <header class="app-header">
+    <div class="header-top">
+      <div class="header-brand">追觅互粉平台</div>
+      <div class="header-user">
+        <div class="avatar" id="hdr-avatar">张</div>
+        <span id="hdr-name">张三</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dashboard Tab -->
+  <div id="tab-dashboard" class="tab-page">
+    <div class="notice-banner" style="display:flex;gap:14px;align-items:center">
+      <img src="https://storage.res-capy.com/storage/upload/users/usr_01KHTDRMH9FEHH1M58ZJG7WT40/workspaces/default-workspace/sessions/1777530523562/33ee2837-7d78-44c8-afb8-7ea1e35fb00b.jpg"
+        alt="俞浩" style="width:60px;height:60px;border-radius:50%;object-fit:cover;object-position:center top;border:2px solid rgba(255,255,255,.5);flex-shrink:0" />
+      <div>
+        <div class="notice-title">🏆 俞浩老板的涨粉激励</div>
+        <div class="notice-text">每天15分钟视频 · 每天3条 · 全平台开通<br>1万粉→¥1万 · 5万粉→¥5万 · 10万粉→¥10万</div>
+      </div>
+    </div>
+    <div class="stats-grid" id="dash-stats"></div>
+    <div class="card">
+      <div class="card-title">我的涨粉进度</div>
+      <div id="dash-progress"></div>
+      <div class="reward-tiers" id="dash-tiers"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">账号概览</div>
+      <div id="dash-platforms"></div>
+    </div>
+  </div>
+
+  <!-- Accounts Tab -->
+  <div id="tab-accounts" class="tab-page hidden">
+    <div class="page-title">我的账号</div>
+    <div class="page-subtitle">管理各平台账号链接，定期更新粉丝数</div>
+    <div id="accounts-list"></div>
+  </div>
+
+  <!-- Discover Tab -->
+  <div id="tab-discover" class="tab-page hidden">
+    <div class="page-title">互粉广场</div>
+    <div class="page-subtitle">点击同事账号链接完成关注，帮彼此涨粉</div>
+    <input type="text" class="search-bar" placeholder="🔍 搜索同事姓名或部门..." id="discover-search" oninput="renderDiscover()" />
+    <div id="discover-list"></div>
+  </div>
+
+  <!-- Leaderboard Tab -->
+  <div id="tab-leaderboard" class="tab-page hidden">
+    <div class="page-title">涨粉排行榜</div>
+    <div class="page-subtitle">全员实时粉丝数排名</div>
+    <div id="my-rank-card"></div>
+    <div id="lb-list"></div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('dashboard',this)">
+      <span class="nav-icon">📊</span><span class="nav-label">我的进度</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('accounts',this)">
+      <span class="nav-icon">📱</span><span class="nav-label">我的账号</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('discover',this)">
+      <span class="nav-icon">🤝</span><span class="nav-label">互粉广场</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('leaderboard',this)">
+      <span class="nav-icon">🏆</span><span class="nav-label">排行榜</span>
+    </button>
+  </nav>
+</div>
+
+<!-- EDIT PLATFORM MODAL -->
+<div class="modal-overlay hidden" id="modal-platform">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('modal-platform')">×</button>
+    <div class="modal-title" id="modal-platform-title">编辑账号</div>
+    <div class="form-group">
+      <label>账号主页链接</label>
+      <input type="url" id="m-url" placeholder="https://" />
+    </div>
+    <div class="form-group">
+      <label>当前粉丝数</label>
+      <input type="number" id="m-followers" placeholder="0" min="0" />
+    </div>
+    <button class="btn-primary" onclick="savePlatform()">保存</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ====== CONFIG ======
+const PLATFORMS=[
+  {id:'douyin',      name:'抖音',  icon:'🎵',bg:'#f5f5f5'},
+  {id:'xiaohongshu', name:'小红书', icon:'📕',bg:'#fff0f2'},
+  {id:'bilibili',    name:'B站',   icon:'📺',bg:'#e8f8ff'},
+  {id:'shipinhao',   name:'视频号', icon:'📲',bg:'#f0fff8'},
+  {id:'weibo',       name:'微博',  icon:'🔴',bg:'#fff0f0'},
+  {id:'kuaishou',    name:'快手',  icon:'⚡',bg:'#fff7f0'},
+  {id:'zhihu',       name:'知乎',  icon:'💡',bg:'#f0f7ff'},
+];
+const REWARDS=[
+  {target:10000, reward:'1万元', label:'1万粉', rewardLabel:'奖励¥1万'},
+  {target:50000, reward:'5万元', label:'5万粉', rewardLabel:'奖励¥5万'},
+  {target:100000,reward:'10万元',label:'10万粉',rewardLabel:'奖励¥10万'},
+];
+const MOCK=[
+  {id:'EMP002',name:'李晓明',dept:'技术部',accounts:{douyin:{url:'https://www.douyin.com/user/li_tech',followers:8200},bilibili:{url:'https://space.bilibili.com/li_tech',followers:3400},xiaohongshu:{url:'https://www.xiaohongshu.com/li',followers:1200}},following:[]},
+  {id:'EMP003',name:'王芳',dept:'设计部',accounts:{xiaohongshu:{url:'https://www.xiaohongshu.com/wang_design',followers:12800},douyin:{url:'https://www.douyin.com/user/wang_design',followers:6700},weibo:{url:'https://weibo.com/wang_design',followers:2300}},following:[]},
+  {id:'EMP004',name:'陈志远',dept:'产品部',accounts:{bilibili:{url:'https://space.bilibili.com/chen_pm',followers:15600},douyin:{url:'https://www.douyin.com/user/chen_pm',followers:9800},zhihu:{url:'https://www.zhihu.com/people/chen_pm',followers:4200}},following:[]},
+  {id:'EMP005',name:'刘雨晴',dept:'市场部',accounts:{xiaohongshu:{url:'https://www.xiaohongshu.com/liu_mkt',followers:22000},weibo:{url:'https://weibo.com/liu_mkt',followers:8900},douyin:{url:'https://www.douyin.com/user/liu_mkt',followers:5400},kuaishou:{url:'https://www.kuaishou.com/profile/liu_mkt',followers:3200}},following:[]},
+  {id:'EMP006',name:'赵强',dept:'供应链部',accounts:{douyin:{url:'https://www.douyin.com/user/zhao_supply',followers:4100},bilibili:{url:'https://space.bilibili.com/zhao_supply',followers:1800}},following:[]},
+  {id:'EMP007',name:'孙雅婷',dept:'运营部',accounts:{shipinhao:{url:'https://channels.weixin.qq.com/sun_ops',followers:6700},douyin:{url:'https://www.douyin.com/user/sun_ops',followers:11200},xiaohongshu:{url:'https://www.xiaohongshu.com/sun_ops',followers:7800},weibo:{url:'https://weibo.com/sun_ops',followers:3200}},following:[]},
+  {id:'EMP008',name:'周建国',dept:'技术部',accounts:{bilibili:{url:'https://space.bilibili.com/zhou_tech',followers:28900},zhihu:{url:'https://www.zhihu.com/people/zhou_tech',followers:15600},douyin:{url:'https://www.douyin.com/user/zhou_tech',followers:8200}},following:[]},
+  {id:'EMP009',name:'吴晓娜',dept:'设计部',accounts:{xiaohongshu:{url:'https://www.xiaohongshu.com/wu_design',followers:45000},douyin:{url:'https://www.douyin.com/user/wu_design',followers:23400},shipinhao:{url:'https://channels.weixin.qq.com/wu_design',followers:8900}},following:[]},
+  {id:'EMP010',name:'郑凯',dept:'销售部',accounts:{douyin:{url:'https://www.douyin.com/user/zheng_sales',followers:67800},kuaishou:{url:'https://www.kuaishou.com/profile/zheng_sales',followers:34500},shipinhao:{url:'https://channels.weixin.qq.com/zheng_sales',followers:12300}},following:[]},
+  {id:'EMP011',name:'马颖',dept:'客服部',accounts:{xiaohongshu:{url:'https://www.xiaohongshu.com/ma_cs',followers:3200},douyin:{url:'https://www.douyin.com/user/ma_cs',followers:2100}},following:[]},
+  {id:'EMP012',name:'徐浩然',dept:'产品部',accounts:{bilibili:{url:'https://space.bilibili.com/xu_pm',followers:9800},zhihu:{url:'https://www.zhihu.com/people/xu_pm',followers:6700},douyin:{url:'https://www.douyin.com/user/xu_pm',followers:4500}},following:[]},
+];
+
+// ====== STATE ======
+let currentUser=null,employees=[],_editPid=null;
+
+// ====== STORAGE ======
+function loadData(){
+  const s=localStorage.getItem('dreame_emps');
+  employees=s?JSON.parse(s):[...MOCK];
+  if(!s)saveData();
+  const u=localStorage.getItem('dreame_user');
+  if(u)currentUser=JSON.parse(u);
+}
+function saveData(){localStorage.setItem('dreame_emps',JSON.stringify(employees))}
+function saveUser(){localStorage.setItem('dreame_user',JSON.stringify(currentUser))}
+
+// ====== HELPERS ======
+function totalFans(e){return Object.values(e.accounts||{}).reduce((s,a)=>s+(a.followers||0),0)}
+function fmt(n){if(n>=10000)return(n/10000).toFixed(1)+'万';return n.toLocaleString()}
+function getEmp(){
+  let e=employees.find(x=>x.id===currentUser.id);
+  if(!e){e={id:currentUser.id,name:currentUser.name,dept:currentUser.dept,accounts:{},following:[]};employees.push(e);saveData()}
+  return e;
+}
+function nextTarget(total){
+  if(total<10000)return{target:10000,reward:'¥1万',label:'1万粉'};
+  if(total<50000)return{target:50000,reward:'¥5万',label:'5万粉'};
+  if(total<100000)return{target:100000,reward:'¥10万',label:'10万粉'};
+  return null;
+}
+function tierLabel(total){
+  if(total>=100000)return{text:'10万粉✓',cls:'tier-gold'};
+  if(total>=50000)return{text:'5万粉✓',cls:'tier-gold'};
+  if(total>=10000)return{text:'1万粉✓',cls:'tier-blue'};
+  return{text:'冲向1万',cls:'tier-none'};
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+function closeModal(id){document.getElementById(id).classList.add('hidden')}
+
+// ====== LOGIN ======
+function handleLogin(){
+  const id=document.getElementById('login-id').value.trim();
+  const name=document.getElementById('login-name').value.trim();
+  const dept=document.getElementById('login-dept').value;
+  if(!id||!name){showToast('请填写工号和姓名');return}
+  currentUser={id,name,dept};saveUser();
+  const e=getEmp();e.name=name;e.dept=dept;saveData();
+  document.getElementById('page-login').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('hdr-avatar').textContent=name[0];
+  document.getElementById('hdr-name').textContent=name;
+  renderAll();
+}
+
+// ====== TAB ======
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-page').forEach(p=>p.classList.add('hidden'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.remove('hidden');
+  btn.classList.add('active');
+  if(tab==='dashboard')renderDashboard();
+  if(tab==='accounts')renderAccounts();
+  if(tab==='discover')renderDiscover();
+  if(tab==='leaderboard')renderLeaderboard();
+}
+function renderAll(){renderDashboard()}
+
+// ====== DASHBOARD ======
+function renderDashboard(){
+  const e=getEmp(),total=totalFans(e);
+  const rank=[...employees].sort((a,b)=>totalFans(b)-totalFans(a)).findIndex(x=>x.id===e.id)+1;
+  const pCount=Object.keys(e.accounts).length;
+  const fCount=(e.following||[]).length;
+
+  document.getElementById('dash-stats').innerHTML=`
+    <div class="stat-card"><div class="stat-value">${fmt(total)}</div><div class="stat-label">总粉丝数</div></div>
+    <div class="stat-card"><div class="stat-value">#${rank}</div><div class="stat-label">全员排名</div></div>
+    <div class="stat-card"><div class="stat-value">${pCount}</div><div class="stat-label">已开通平台</div></div>
+    <div class="stat-card"><div class="stat-value">${fCount}</div><div class="stat-label">已关注同事</div></div>`;
+
+  const nt=nextTarget(total);
+  let prog='';
+  if(nt){
+    const pct=Math.min(100,(total/nt.target)*100);
+    const cls=nt.target===50000?'t2':nt.target===100000?'t3':'';
+    prog=`<div class="progress-container">
+      <div class="progress-header">
+        <span class="progress-label">距 ${nt.label} 还差 ${fmt(nt.target-total)} 粉</span>
+        <span class="progress-meta">${pct.toFixed(1)}%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill ${cls}" style="width:${pct}%"></div></div>
+    </div>`;
+  }else{
+    prog=`<p style="text-align:center;color:#10b981;font-weight:800;padding:8px">🎉 恭喜！已达成10万粉目标！奖励¥10万到手！</p>`;
+  }
+  document.getElementById('dash-progress').innerHTML=prog;
+
+  document.getElementById('dash-tiers').innerHTML=REWARDS.map(r=>{
+    let cls='tier-badge',status=`差${fmt(Math.max(0,r.target-total))}粉`;
+    if(total>=r.target){cls+=' achieved';status='✅ 已达成'}
+    else if(nt&&nt.target===r.target)cls+=' current';
+    return`<div class="${cls}"><div class="tier-amount">${r.label}</div><div class="tier-reward">${r.rewardLabel}</div><div class="tier-status">${status}</div></div>`;
+  }).join('');
+
+  document.getElementById('dash-platforms').innerHTML=PLATFORMS.map(p=>{
+    const a=e.accounts[p.id];
+    if(!a)return`<div class="platform-item" style="opacity:.4">
+      <div class="p-icon" style="background:${p.bg}">${p.icon}</div>
+      <div class="p-info"><div class="p-name">${p.name}</div><div class="p-url">未开通</div></div>
+      <button class="btn-sm" onclick="openEdit('${p.id}')">开通</button></div>`;
+    return`<div class="platform-item">
+      <div class="p-icon" style="background:${p.bg}">${p.icon}</div>
+      <div class="p-info"><div class="p-name">${p.name}</div><div class="p-url">${a.url||'已开通'}</div></div>
+      <div class="p-fans"><div class="fans-count">${fmt(a.followers||0)}</div><div class="fans-label">粉丝</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ====== ACCOUNTS ======
+function renderAccounts(){
+  const e=getEmp();
+  document.getElementById('accounts-list').innerHTML=PLATFORMS.map(p=>{
+    const a=e.accounts[p.id];
+    const has=!!a;
+    return`<div class="card" style="margin-bottom:9px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="p-icon" style="background:${p.bg};width:44px;height:44px;border-radius:10px;font-size:22px;flex-shrink:0">${p.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:800">${p.name}</div>
+          ${has?`<div style="font-size:11px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.url||'未填写链接'}</div>
+          <div style="font-size:12px;color:#1a6cf3;font-weight:700;margin-top:2px">粉丝：${fmt(a.followers||0)}</div>`
+          :`<div style="font-size:11px;color:#94a3b8">未开通</div>`}
+        </div>
+        <button class="btn-sm" onclick="openEdit('${p.id}')">${has?'编辑':'开通'}</button>
+      </div></div>`;
+  }).join('');
+}
+
+// ====== EDIT PLATFORM ======
+function openEdit(pid){
+  _editPid=pid;
+  const p=PLATFORMS.find(x=>x.id===pid),e=getEmp(),a=e.accounts[pid]||{};
+  document.getElementById('modal-platform-title').textContent=`${p.icon} ${p.name} 账号信息`;
+  document.getElementById('m-url').value=a.url||'';
+  document.getElementById('m-followers').value=a.followers||'';
+  document.getElementById('modal-platform').classList.remove('hidden');
+}
+function savePlatform(){
+  const url=document.getElementById('m-url').value.trim();
+  const followers=parseInt(document.getElementById('m-followers').value)||0;
+  const e=getEmp();
+  if(!e.accounts[_editPid])e.accounts[_editPid]={};
+  e.accounts[_editPid].url=url;
+  e.accounts[_editPid].followers=followers;
+  saveData();closeModal('modal-platform');showToast('保存成功 ✓');
+  renderDashboard();renderAccounts();
+}
+
+// ====== DISCOVER ======
+function renderDiscover(){
+  const e=getEmp(),following=e.following||[];
+  const q=(document.getElementById('discover-search')?.value||'').toLowerCase();
+  const others=employees.filter(x=>{
+    if(x.id===currentUser.id)return false;
+    if(!Object.keys(x.accounts).length)return false;
+    if(q)return x.name.toLowerCase().includes(q)||x.dept.toLowerCase().includes(q);
+    return true;
+  }).sort((a,b)=>totalFans(b)-totalFans(a));
+
+  if(!others.length){
+    document.getElementById('discover-list').innerHTML=`<div class="empty-state"><div class="empty-icon">🔍</div><div>暂无其他员工</div></div>`;
+    return;
+  }
+  document.getElementById('discover-list').innerHTML=others.map(o=>{
+    const tot=totalFans(o);
+    const pBtns=Object.keys(o.accounts).map(pid=>{
+      const p=PLATFORMS.find(x=>x.id===pid)||{icon:'',name:pid};
+      const key=`${o.id}_${pid}`;
+      const isF=following.includes(key);
+      return`<a href="${o.accounts[pid].url||'#'}" target="_blank"
+        class="p-link-btn${isF?' followed':''}"
+        onclick="markFollowed('${o.id}','${pid}',event)">
+        ${p.icon} ${p.name}${isF?' ✓':''}
+      </a>`;
+    }).join('');
+    return`<div class="emp-card">
+      <div class="emp-header">
+        <div class="avatar">${o.name[0]}</div>
+        <div class="emp-info"><h3>${o.name}</h3><div class="dept">${o.dept}</div></div>
+        <div class="emp-fans"><div class="emp-total">${fmt(tot)}</div><div class="emp-total-label">总粉丝</div></div>
+      </div>
+      <div class="platform-links">${pBtns}</div>
+    </div>`;
+  }).join('');
+}
+function markFollowed(eid,pid,ev){
+  const e=getEmp();if(!e.following)e.following=[];
+  const key=`${eid}_${pid}`;
+  if(!e.following.includes(key)){e.following.push(key);saveData();showToast('已标记关注 ✓');renderDiscover()}
+}
+
+// ====== LEADERBOARD ======
+function renderLeaderboard(){
+  const e=getEmp(),myTotal=totalFans(e);
+  const sorted=[...employees]
+    .filter(x=>Object.keys(x.accounts).length>0)
+    .map(x=>({...x,total:totalFans(x)}))
+    .sort((a,b)=>b.total-a.total);
+  const myRank=sorted.findIndex(x=>x.id===currentUser.id)+1;
+
+  document.getElementById('my-rank-card').innerHTML=`
+    <div class="my-rank-card">
+      <div class="my-rank-num">#${myRank||'?'}</div>
+      <div class="my-rank-info">
+        <h3>${e.name} · 全员第 ${myRank||'?'} 名</h3>
+        <p>总粉丝 ${fmt(myTotal)} · ${e.dept}</p>
+      </div>
+    </div>`;
+
+  document.getElementById('lb-list').innerHTML=sorted.slice(0,30).map((x,i)=>{
+    const r=i+1,isMe=x.id===currentUser.id;
+    const rb=r===1?`<div class="rank-badge r1">🥇</div>`:r===2?`<div class="rank-badge r2">🥈</div>`:r===3?`<div class="rank-badge r3">🥉</div>`:`<div class="rank-badge rn">${r}</div>`;
+    const tl=tierLabel(x.total);
+    return`<div class="lb-item${isMe?' me':''}">
+      ${rb}
+      <div class="avatar" style="${isMe?'background:#1a6cf3':''}">${x.name[0]}</div>
+      <div class="lb-name">${x.name}${isMe?'<span style="color:#1a6cf3;font-size:10px;font-weight:700"> (我)</span>':''}<div class="lb-dept">${x.dept}</div></div>
+      <div class="lb-fans">
+        <div class="lb-total">${fmt(x.total)}</div>
+        <div class="lb-tier ${tl.cls}">${tl.text}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ====== INIT ======
+loadData();
+if(currentUser){
+  document.getElementById('page-login').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('hdr-avatar').textContent=currentUser.name[0];
+  document.getElementById('hdr-name').textContent=currentUser.name;
+  renderAll();
+}else{
+  document.getElementById('login-id').value='EMP001';
+  document.getElementById('login-name').value='';
+}
+</script>
+</body>
+</html>
