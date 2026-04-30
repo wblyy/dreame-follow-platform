@@ -158,15 +158,7 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 /* SECTION TITLE */
 .section-title{font-size:13px;font-weight:700;margin-bottom:9px;display:flex;align-items:center;gap:6px}
 
-/* FOLLOW-BACK RATE */
-.fb-badge{display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:99px;font-size:11px;font-weight:700;margin-left:auto;flex-shrink:0}
-.fb-high{background:#dcfce7;color:#15803d}
-.fb-mid{background:#fef9c3;color:#a16207}
-.fb-low{background:#fee2e2;color:#b91c1c}
-.fb-none{background:#f1f5f9;color:#64748b}
-.btn-followback{background:#f0fdf4;color:#15803d;border:1.5px solid #86efac;border-radius:7px;padding:5px 9px;font-size:11px;font-weight:700;cursor:pointer}
-.btn-followback:hover{background:#dcfce7}
-.btn-followback.done{background:#dcfce7;border-color:#4ade80}
+
 </style>
 </head>
 <body>
@@ -251,14 +243,15 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
   <div id="tab-discover" class="tab-page">
     <div class="page-title">互粉广场</div>
     <div class="page-subtitle">点击同事账号完成关注，大家一起帮老板冲粉丝</div>
+    <!-- IM reminder notice (always visible) -->
+    <div style="margin:0 0 10px;background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:12px;padding:12px 14px;font-size:12px;color:#0369a1;line-height:1.7">
+      💬 <strong>对方没有回粉你？</strong> 直接在公司 IM 里找到这个人，说一句：「我刚关注你了，你也帮我回粉一下」就行，一句话的事。
+    </div>
     <!-- CTA: user has no accounts yet -->
     <div id="discover-cta" style="display:none;margin:0 0 10px;background:linear-gradient(135deg,#fff7ed,#fef3c7);border:2px solid #fbbf24;border-radius:14px;padding:16px">
       <div style="font-size:14px;font-weight:800;color:#92400e;margin-bottom:6px">先上传你的账号，才能让别人回粉你</div>
-      <div style="font-size:12px;color:#a16207;line-height:1.6;margin-bottom:12px">你现在可以关注别人，但别人不知道你在哪儿。<br>上传账号链接 → 别人回粉你 → 粉丝数增长 → 拿奖金</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button onclick="switchToAccounts()" style="flex:1;padding:10px;background:#f59e0b;color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer">+ 立即上传我的账号</button>
-        <button onclick="document.getElementById('discover-cta').style.display='none'" style="padding:10px 14px;background:white;color:#92400e;border:1.5px solid #fcd34d;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer">先看看</button>
-      </div>
+      <div style="font-size:12px;color:#a16207;line-height:1.6;margin-bottom:12px">你现在可以关注别人，但别人不知道你在哪儿。<br>上传账号链接 → 别人回粉你 → 粉丝增长 → 拿奖金</div>
+      <button onclick="switchToAccounts()" style="width:100%;padding:10px;background:#f59e0b;color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer">+ 立即上传我的账号</button>
     </div>
     <input type="text" class="search-bar" placeholder="🔍 搜索同事姓名或部门..." id="discover-search" oninput="renderDiscover()" />
     <div id="discover-list"></div>
@@ -301,12 +294,8 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
       </div>
     </div>
     <div class="form-group">
-      <label style="display:flex;justify-content:space-between;align-items:center">
-        <span>当前粉丝数 <span style="color:#ef4444;font-size:10px">*需手动或自动获取</span></span>
-        <button id="m-fetch-btn" onclick="tryAutoFetch()" style="display:none;background:#10b981;color:white;border:none;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">🔄 自动获取</button>
-      </label>
+      <label>当前粉丝数</label>
       <input type="number" id="m-followers" placeholder="填写你的实际粉丝数（如 12000）" min="0" />
-      <div id="m-fetch-hint" style="font-size:11px;margin-top:5px;line-height:1.5"></div>
     </div>
     <button class="btn-primary" onclick="savePlatform()">保存</button>
   </div>
@@ -331,17 +320,17 @@ const REWARDS=[
   {target:100000,reward:'10万元',label:'10万粉',rewardLabel:'奖励¥10万'},
 ];
 const MOCK=[
-  {id:'EMP002',name:'李晓明',dept:'技术部',fbRate:70,fbCount:14,followedCount:20,accounts:{douyin:{url:'https://www.douyin.com/user/li_tech',followers:8200},bilibili:{url:'https://space.bilibili.com/li_tech',followers:3400},xiaohongshu:{url:'https://www.xiaohongshu.com/li',followers:1200}},following:[]},
-  {id:'EMP003',name:'王芳',dept:'设计部',fbRate:88,fbCount:22,followedCount:25,accounts:{xiaohongshu:{url:'https://www.xiaohongshu.com/wang_design',followers:12800},douyin:{url:'https://www.douyin.com/user/wang_design',followers:6700},weibo:{url:'https://weibo.com/wang_design',followers:2300}},following:[]},
-  {id:'EMP004',name:'陈志远',dept:'产品部',fbRate:62,fbCount:13,followedCount:21,accounts:{bilibili:{url:'https://space.bilibili.com/chen_pm',followers:15600},douyin:{url:'https://www.douyin.com/user/chen_pm',followers:9800},zhihu:{url:'https://www.zhihu.com/people/chen_pm',followers:4200}},following:[]},
-  {id:'EMP005',name:'刘雨晴',dept:'市场部',fbRate:93,fbCount:28,followedCount:30,accounts:{xiaohongshu:{url:'https://www.xiaohongshu.com/liu_mkt',followers:22000},weibo:{url:'https://weibo.com/liu_mkt',followers:8900},douyin:{url:'https://www.douyin.com/user/liu_mkt',followers:5400},kuaishou:{url:'https://www.kuaishou.com/profile/liu_mkt',followers:3200}},following:[]},
-  {id:'EMP006',name:'赵强',dept:'供应链部',fbRate:38,fbCount:6,followedCount:16,accounts:{douyin:{url:'https://www.douyin.com/user/zhao_supply',followers:4100},bilibili:{url:'https://space.bilibili.com/zhao_supply',followers:1800}},following:[]},
-  {id:'EMP007',name:'孙雅婷',dept:'运营部',fbRate:82,fbCount:18,followedCount:22,accounts:{shipinhao:{url:'https://channels.weixin.qq.com/sun_ops',followers:6700},douyin:{url:'https://www.douyin.com/user/sun_ops',followers:11200},xiaohongshu:{url:'https://www.xiaohongshu.com/sun_ops',followers:7800},weibo:{url:'https://weibo.com/sun_ops',followers:3200}},following:[]},
-  {id:'EMP008',name:'周建国',dept:'技术部',fbRate:76,fbCount:19,followedCount:25,accounts:{bilibili:{url:'https://space.bilibili.com/zhou_tech',followers:28900},zhihu:{url:'https://www.zhihu.com/people/zhou_tech',followers:15600},douyin:{url:'https://www.douyin.com/user/zhou_tech',followers:8200}},following:[]},
-  {id:'EMP009',name:'吴晓娜',dept:'设计部',fbRate:95,fbCount:38,followedCount:40,accounts:{xiaohongshu:{url:'https://www.xiaohongshu.com/wu_design',followers:45000},douyin:{url:'https://www.douyin.com/user/wu_design',followers:23400},shipinhao:{url:'https://channels.weixin.qq.com/wu_design',followers:8900}},following:[]},
-  {id:'EMP010',name:'郑凯',dept:'销售部',fbRate:67,fbCount:20,followedCount:30,accounts:{douyin:{url:'https://www.douyin.com/user/zheng_sales',followers:67800},kuaishou:{url:'https://www.kuaishou.com/profile/zheng_sales',followers:34500},shipinhao:{url:'https://channels.weixin.qq.com/zheng_sales',followers:12300}},following:[]},
-  {id:'EMP011',name:'马颖',dept:'客服部',fbRate:50,fbCount:8,followedCount:16,accounts:{xiaohongshu:{url:'https://www.xiaohongshu.com/ma_cs',followers:3200},douyin:{url:'https://www.douyin.com/user/ma_cs',followers:2100}},following:[]},
-  {id:'EMP012',name:'徐浩然',dept:'产品部',fbRate:74,fbCount:17,followedCount:23,accounts:{bilibili:{url:'https://space.bilibili.com/xu_pm',followers:9800},zhihu:{url:'https://www.zhihu.com/people/xu_pm',followers:6700},douyin:{url:'https://www.douyin.com/user/xu_pm',followers:4500}},following:[]},
+  {id:'EMP002',name:'李晓明',dept:'技术部',accounts:{douyin:{url:'https://www.douyin.com/user/li_tech',followers:8200},bilibili:{url:'https://space.bilibili.com/li_tech',followers:3400},xiaohongshu:{url:'https://www.xiaohongshu.com/li',followers:1200}},following:[]},
+  {id:'EMP003',name:'王芳',dept:'设计部',accounts:{xiaohongshu:{url:'https://www.xiaohongshu.com/wang_design',followers:12800},douyin:{url:'https://www.douyin.com/user/wang_design',followers:6700},weibo:{url:'https://weibo.com/wang_design',followers:2300}},following:[]},
+  {id:'EMP004',name:'陈志远',dept:'产品部',accounts:{bilibili:{url:'https://space.bilibili.com/chen_pm',followers:15600},douyin:{url:'https://www.douyin.com/user/chen_pm',followers:9800},zhihu:{url:'https://www.zhihu.com/people/chen_pm',followers:4200}},following:[]},
+  {id:'EMP005',name:'刘雨晴',dept:'市场部',accounts:{xiaohongshu:{url:'https://www.xiaohongshu.com/liu_mkt',followers:22000},weibo:{url:'https://weibo.com/liu_mkt',followers:8900},douyin:{url:'https://www.douyin.com/user/liu_mkt',followers:5400},kuaishou:{url:'https://www.kuaishou.com/profile/liu_mkt',followers:3200}},following:[]},
+  {id:'EMP006',name:'赵强',dept:'供应链部',accounts:{douyin:{url:'https://www.douyin.com/user/zhao_supply',followers:4100},bilibili:{url:'https://space.bilibili.com/zhao_supply',followers:1800}},following:[]},
+  {id:'EMP007',name:'孙雅婷',dept:'运营部',accounts:{shipinhao:{url:'https://channels.weixin.qq.com/sun_ops',followers:6700},douyin:{url:'https://www.douyin.com/user/sun_ops',followers:11200},xiaohongshu:{url:'https://www.xiaohongshu.com/sun_ops',followers:7800},weibo:{url:'https://weibo.com/sun_ops',followers:3200}},following:[]},
+  {id:'EMP008',name:'周建国',dept:'技术部',accounts:{bilibili:{url:'https://space.bilibili.com/zhou_tech',followers:28900},zhihu:{url:'https://www.zhihu.com/people/zhou_tech',followers:15600},douyin:{url:'https://www.douyin.com/user/zhou_tech',followers:8200}},following:[]},
+  {id:'EMP009',name:'吴晓娜',dept:'设计部',accounts:{xiaohongshu:{url:'https://www.xiaohongshu.com/wu_design',followers:45000},douyin:{url:'https://www.douyin.com/user/wu_design',followers:23400},shipinhao:{url:'https://channels.weixin.qq.com/wu_design',followers:8900}},following:[]},
+  {id:'EMP010',name:'郑凯',dept:'销售部',accounts:{douyin:{url:'https://www.douyin.com/user/zheng_sales',followers:67800},kuaishou:{url:'https://www.kuaishou.com/profile/zheng_sales',followers:34500},shipinhao:{url:'https://channels.weixin.qq.com/zheng_sales',followers:12300}},following:[]},
+  {id:'EMP011',name:'马颖',dept:'客服部',accounts:{xiaohongshu:{url:'https://www.xiaohongshu.com/ma_cs',followers:3200},douyin:{url:'https://www.douyin.com/user/ma_cs',followers:2100}},following:[]},
+  {id:'EMP012',name:'徐浩然',dept:'产品部',accounts:{bilibili:{url:'https://space.bilibili.com/xu_pm',followers:9800},zhihu:{url:'https://www.zhihu.com/people/xu_pm',followers:6700},douyin:{url:'https://www.douyin.com/user/xu_pm',followers:4500}},following:[]},
 ];
 
 // ====== STATE ======
@@ -492,67 +481,10 @@ function renderAccounts(){
 function onUrlInput(){
   const url=document.getElementById('m-url').value.trim();
   const openBtn=document.getElementById('m-open-btn');
-  const fetchBtn=document.getElementById('m-fetch-btn');
-  if(url&&url.startsWith('http')){
-    openBtn.href=url;openBtn.style.display='block';fetchBtn.style.display='block';
-  }else{openBtn.style.display='none';fetchBtn.style.display='none';}
+  if(url&&url.startsWith('http')){openBtn.href=url;openBtn.style.display='block';}
+  else{openBtn.style.display='none';}
 }
 
-// CN server: use relative URL (same-origin, no Mixed Content)
-// GitHub Pages: use absolute HTTP (blocked by browser Mixed Content)
-const FANS_PROXY=location.hostname==='8.139.4.60'?'/fans':'http://8.139.4.60/fans';
-
-function parseUserId(url){
-  // XHS: https://www.xiaohongshu.com/user/profile/5b67431a69d6ce0001a73c66
-  const xhs=url.match(/xiaohongshu\.com\/user\/profile\/([a-f0-9]+)/i);
-  if(xhs)return{platform:'xhs',user_id:xhs[1]};
-  // Bilibili: https://space.bilibili.com/12345678
-  const bili=url.match(/space\.bilibili\.com\/(\d+)/);
-  if(bili)return{platform:'bilibili',user_id:bili[1]};
-  // Weibo: https://weibo.com/u/1234567 or https://weibo.com/n/username
-  const wbu=url.match(/weibo\.com\/u\/(\d+)/);
-  if(wbu)return{platform:'weibo',user_id:wbu[1]};
-  return null;
-}
-
-async function fetchFollowerCount(url){
-  try{
-    const parsed=parseUserId(url);
-    if(parsed){
-      const r=await fetch(`${FANS_PROXY}?platform=${parsed.platform}&user_id=${parsed.user_id}`,{signal:AbortSignal.timeout(12000)});
-      const d=await r.json();
-      if(d.success&&d.fans!=null)return d.fans;
-    }
-    // Bilibili fallback (public API, no CORS issue)
-    if(url.includes('bilibili.com')){
-      const m=url.match(/space\.bilibili\.com\/(\d+)/);
-      if(m){
-        const r=await fetch(`https://api.bilibili.com/x/relation/stat?vmid=${m[1]}`,{signal:AbortSignal.timeout(6000)});
-        const d=await r.json();
-        if(d.code===0)return d.data.follower;
-      }
-    }
-  }catch(e){console.warn('auto fetch error:',e)}
-  return null;
-}
-
-async function tryAutoFetch(){
-  const url=document.getElementById('m-url').value.trim();
-  const btn=document.getElementById('m-fetch-btn');
-  const hint=document.getElementById('m-fetch-hint');
-  btn.textContent='获取中...';btn.disabled=true;
-  hint.style.color='#64748b';hint.textContent='正在尝试获取真实粉丝数，请稍候...';
-  const count=await fetchFollowerCount(url);
-  btn.textContent='🔄 自动获取';btn.disabled=false;
-  if(count!==null&&count>0){
-    document.getElementById('m-followers').value=count;
-    hint.style.color='#10b981';
-    hint.textContent=`✓ 自动获取成功：${fmt(count)} 粉丝`;
-  }else{
-    hint.style.color='#ef4444';
-    hint.innerHTML='自动获取失败（平台有反爬保护）。<br>请手动操作：点击上方「打开」按钮查看账号页面，将粉丝数填入上方输入框。';
-  }
-}
 
 function openEdit(pid){
   _editPid=pid;
@@ -560,7 +492,6 @@ function openEdit(pid){
   document.getElementById('modal-platform-title').textContent=`${p.icon} ${p.name} 账号信息`;
   document.getElementById('m-url').value=a.url||'';
   document.getElementById('m-followers').value=a.followers||'';
-  document.getElementById('m-fetch-hint').textContent='';
   document.getElementById('modal-platform').classList.remove('hidden');
   // Show/hide helper buttons based on existing URL
   onUrlInput();
@@ -576,48 +507,13 @@ function savePlatform(){
   renderDashboard();renderAccounts();
 }
 
-// ====== FOLLOW-BACK RATE ======
-function getFbBadgeHtml(emp){
-  const rate=emp.fbRate||0;
-  const count=emp.fbCount||0,total=emp.followedCount||0;
-  if(!total)return`<span class="fb-badge fb-none">暂无数据</span>`;
-  let cls,label;
-  if(rate>=80){cls='fb-high';label=`🟢 回粉率 ${rate}%`;}
-  else if(rate>=55){cls='fb-mid';label=`🟡 回粉率 ${rate}%`;}
-  else{cls='fb-low';label=`🔴 回粉率 ${rate}%`;}
-  return`<span class="fb-badge ${cls}" title="${count}/${total} 人回粉">${label}</span>`;
-}
-function markFollowBack(eid,ev){
-  ev.preventDefault();ev.stopPropagation();
-  const e=getEmp();if(!e.followBacks)e.followBacks=[];
-  if(!e.followBacks.includes(eid)){
-    e.followBacks.push(eid);
-    // Also bump target employee's fbCount
-    const target=employees.find(x=>x.id===eid);
-    if(target){
-      if(!target.followedCount)target.followedCount=1;
-      if(!target.fbCount)target.fbCount=0;
-      target.fbCount++;
-      target.fbRate=Math.round(target.fbCount/target.followedCount*100);
-    }
-    saveData();showToast('已记录回粉 ✓');renderDiscover();
-  }
-}
-
 // ====== DISCOVER ======
 function renderDiscover(){
-  const e=getEmp(),following=e.following||[],followBacks=e.followBacks||[];
+  const e=getEmp(),following=e.following||[];
   const q=(document.getElementById('discover-search')?.value||'').toLowerCase();
   const myAccounts=Object.keys(e.accounts||{});
-  // Show CTA banner if user has no accounts yet
   const ctaBanner=document.getElementById('discover-cta');
-  if(ctaBanner){
-    if(!myAccounts.length){
-      ctaBanner.style.display='block';
-    }else{
-      ctaBanner.style.display='none';
-    }
-  }
+  if(ctaBanner){ctaBanner.style.display=myAccounts.length?'none':'block';}
   const others=employees.filter(x=>{
     if(x.id===currentUser.id)return false;
     if(!Object.keys(x.accounts).length)return false;
@@ -630,9 +526,6 @@ function renderDiscover(){
     return;
   }
   document.getElementById('discover-list').innerHTML=others.map(o=>{
-    const tot=totalFans(o);
-    const hasFollowedAny=Object.keys(o.accounts).some(pid=>following.includes(`${o.id}_${pid}`));
-    const hasFollowedBack=followBacks.includes(o.id);
     const pBtns=Object.keys(o.accounts).map(pid=>{
       const p=PLATFORMS.find(x=>x.id===pid)||{icon:'',name:pid};
       const key=`${o.id}_${pid}`;
@@ -643,30 +536,19 @@ function renderDiscover(){
         ${p.icon} ${p.name}${isF?' ✓':''}
       </a>`;
     }).join('');
-    const fbBackBtn=hasFollowedAny&&!hasFollowedBack
-      ?`<button class="btn-followback" onclick="markFollowBack('${o.id}',event)" title="确认对方已回粉你">🔄 TA回粉我了</button>`
-      :hasFollowedBack?`<span class="fb-badge fb-high">✅ 已互粉</span>`:'';
     return`<div class="emp-card">
       <div class="emp-header">
         <div class="avatar">${o.name[0]}</div>
         <div class="emp-info"><h3>${o.name}</h3><div class="dept">${o.dept}</div></div>
-        ${getFbBadgeHtml(o)}
+        <div class="emp-fans"><div class="emp-total">${fmt(totalFans(o))}</div><div class="emp-total-label">粉丝</div></div>
       </div>
-      <div class="platform-links" style="margin-bottom:${fbBackBtn?'8px':'0'}">${pBtns}</div>
-      ${fbBackBtn?`<div style="display:flex;justify-content:flex-end">${fbBackBtn}</div>`:''}
+      <div class="platform-links">${pBtns}</div>
     </div>`;
   }).join('');
 }
 function markFollowed(eid,pid,ev){
   const e=getEmp();if(!e.following)e.following=[];
   const key=`${eid}_${pid}`;
-  // Track total followed count on target employee
-  const target=employees.find(x=>x.id===eid);
-  if(target&&!e.following.includes(key)){
-    if(!target.followedCount)target.followedCount=0;
-    target.followedCount++;
-    target.fbRate=target.followedCount>0?Math.round((target.fbCount||0)/target.followedCount*100):0;
-  }
   if(!e.following.includes(key)){e.following.push(key);saveData();showToast('已标记关注 ✓');renderDiscover()}
 }
 
